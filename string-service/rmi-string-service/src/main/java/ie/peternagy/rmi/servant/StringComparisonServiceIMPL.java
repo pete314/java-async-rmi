@@ -17,7 +17,7 @@ public class StringComparisonServiceIMPL extends UnicastRemoteObject implements 
     public StringComparisonServiceIMPL() throws RemoteException {}
 
     @Override
-    public void execute(StringComparable sc) {
+    public void execute(StringComparable sc) throws RemoteException{
         System.out.println("[INFO] ERxecuting remote method getMessage() on MessageServiceImpl.");
         System.out.println("[INFO] Method parameter (Encodable) has an object ID of: ");
         sc.run();

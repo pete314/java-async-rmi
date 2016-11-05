@@ -9,7 +9,8 @@
 package ie.peternagy.rmi.servant;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 public interface StringComparisonService extends Remote{
-    public void execute(StringComparable sc);
+    public void execute(StringComparable sc) throws RemoteException;
 }

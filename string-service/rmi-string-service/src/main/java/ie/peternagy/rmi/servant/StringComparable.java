@@ -8,9 +8,12 @@
  */
 package ie.peternagy.rmi.servant;
 
-public interface StringComparable {
-    public int distance(String s, String t);
-    public void run();
-    public boolean isProcessed();
-    public int getResult();
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface StringComparable extends Remote {
+    public int distance(String s, String t) throws RemoteException;
+    public void run() throws RemoteException;
+    public boolean isProcessed() throws RemoteException;
+    public int getResult() throws RemoteException;
 }

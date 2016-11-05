@@ -8,9 +8,11 @@
  */
 package ie.peternagy.rmi.servant;
 
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.UUID;
 
-public class DamerauLevenshtein implements StringComparable{
+public class DamerauLevenshtein extends UnicastRemoteObject implements StringComparable{
     private static final long serialVersionUID = 1L;
     private final UUID objectId = UUID.randomUUID();
     private int result;
@@ -18,13 +20,13 @@ public class DamerauLevenshtein implements StringComparable{
     private String str1;
     private String str2;
 
-    public DamerauLevenshtein(String str1, String str2) {
+    public DamerauLevenshtein(String str1, String str2) throws RemoteException{
         this.str1 = str1;
         this.str2 = str2;
     }
 
     @Override
-    public int distance(String s, String t) {
+    public int distance(String s, String t) throws RemoteException {
         int[][] distance = new int[s.length() + 1][t.length() + 1];
         for (int i = 0; i <= s.length(); i++) distance[i][0] = i;
         for (int j = 0; j <= t.length(); j++) distance[0][j] = j;
@@ -43,18 +45,18 @@ public class DamerauLevenshtein implements StringComparable{
     }
 
     @Override
-    public void run() {
-        result = distance(str1, str1);
+    public void run() throws RemoteException{
+        result = distance(str1, str2);
         isProcessed = true;
     }
 
     @Override
-    public boolean isProcessed() {
+    public boolean isProcessed() throws RemoteException{
         return isProcessed;
     }
 
     @Override
-    public int getResult() {
+    public int getResult() throws RemoteException{
         return result;
     }
 

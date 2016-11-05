@@ -12,10 +12,10 @@ import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 
 public class StringComparisonServer {
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Throwable{
         StringComparisonService scm = new StringComparisonServiceIMPL();
         LocateRegistry.createRegistry(1099);
-        Naming.rebind("string-comparison-service", scm);
+        Naming.rebind("stringComparisonService", scm);
         System.out.println("Server ready.");
     }
 }
