@@ -43,4 +43,5 @@
             </plugin>
         </plugins>
     </build>
+    <name>rmi-string-service</name>
 </project>
