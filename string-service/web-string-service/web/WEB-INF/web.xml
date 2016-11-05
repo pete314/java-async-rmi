@@ -14,7 +14,7 @@
   <!-- RMI service port-->
   <context-param>
     <param-name>RMI_SERVER_IP</param-name>
-    <param-value>127.0.0.1</param-value>
+    <param-value>localhost</param-value>
   </context-param>
   
   <!-- RMI service name-->
@@ -32,7 +32,7 @@
   <!-- A servlet class bound name -->
   <servlet>
     <servlet-name>service-request-handler</servlet-name>
-    <servlet-class>ie.peternagy.web.string.service.ServiceHandler</servlet-class>
+    <servlet-class>ie.peternagy.rmi.servant.ServiceHandler</servlet-class>
     <load-on-startup>0</load-on-startup>
   </servlet>
   

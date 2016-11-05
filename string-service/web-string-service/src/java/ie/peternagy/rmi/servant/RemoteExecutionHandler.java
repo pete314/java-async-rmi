@@ -6,13 +6,14 @@
  * @description RemoteExecutionHandler - this class keeps track of remote executions and it's results
  * @package ie.peternagy.web.string.service
  */
-package ie.peternagy.web.string.service;
+package ie.peternagy.rmi.servant;
 
+import ie.peternagy.rmi.servant.StringComparisonService;
 import ie.peternagy.rmi.string.algo.AlgorithmFactory;
 import ie.peternagy.rmi.string.algo.StringComparable;
 import java.rmi.Naming;
+import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
-import java.rmi.server.RemoteServer;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -35,22 +36,75 @@ public class RemoteExecutionHandler implements Runnable{
         SCM = (StringComparisonService) Naming.lookup(String.format(RMI_CONNECTION_PATTERN, serviceHost, servicePort, serviceName));
     }
     
+    /**
+     * Add new task to execute remotely
+     * 
+     * @param algorithmName - the algorithm name to execute to
+     * @param str1 - #1 string to work with
+     * @param str2 - #1 string to work with
+     * @return the instance uuid
+     */
     public UUID addTask(String algorithmName, String str1, String str2){
         try {
             StringComparable sc = algorithmFactory.newAlgorithm(algorithmName, str1, str2);
             REQUEST_OBJECT_MAP.put(sc.getObjectId(), sc);
             IN_QUEUE.add(sc);
+            
+            return sc.getObjectId();
         } catch (RemoteException ex) {
+            System.out.println("\n============ Exception+++++++++++\n" + ex);
             Logger.getLogger(RemoteExecutionHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return null;
     }
 
+    /**
+     * Check if the task is processed
+     * 
+     * @param itemUuid - the instance uuid
+     * @return 
+     */
+    public boolean isProcessed(UUID itemUuid){
+        boolean status = false;
+        if(REQUEST_OBJECT_MAP.containsKey(itemUuid)){
+            try {
+                status = (REQUEST_OBJECT_MAP.get(itemUuid)).isProcessed();
+            } catch (RemoteException ex) {
+                Logger.getLogger(RemoteExecutionHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        return status;
+    }
+    
+    /**
+     * Get the result of an element 
+     * @param itemUuid
+     * @return 
+     */
+    public int getResult(UUID itemUuid){
+        int result = -99999999;
+        if(REQUEST_OBJECT_MAP.containsKey(itemUuid)){
+            try {
+                result = REQUEST_OBJECT_MAP.get(itemUuid).getResult();
+                REQUEST_OBJECT_MAP.remove(itemUuid);
+            } catch (RemoteException ex) {
+                Logger.getLogger(RemoteExecutionHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        return result;
+    }
     @Override
     public void run() {
         while(true){
-            
+            try {
+                StringComparable sc = IN_QUEUE.take();
+                SCM.execute(sc);
+            } catch (InterruptedException | RemoteException ex) {
+                Logger.getLogger(RemoteExecutionHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     

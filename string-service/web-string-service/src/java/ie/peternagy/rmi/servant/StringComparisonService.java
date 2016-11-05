@@ -6,7 +6,7 @@
  * @description StringComparisonService - Remote service interface
  * @package ie.peternagy.web.string.service (origin - ie.peternagy.rmi.servant)
  */
-package ie.peternagy.web.string.service;
+package ie.peternagy.rmi.servant;
 
 import ie.peternagy.rmi.string.algo.StringComparable;
 import java.rmi.Remote;
