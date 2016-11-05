@@ -16,6 +16,6 @@ public class StringComparisonServer {
         StringComparisonService scm = new StringComparisonServiceIMPL();
         LocateRegistry.createRegistry(1099);
         Naming.rebind("stringComparisonService", scm);
-        System.out.println("Server ready.");
+        System.out.println("Server is ready.");
     }
 }

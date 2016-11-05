@@ -8,6 +8,7 @@
  */
 package ie.peternagy.rmi.servant;
 
+import ie.peternagy.rmi.string.algo.StringComparable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 

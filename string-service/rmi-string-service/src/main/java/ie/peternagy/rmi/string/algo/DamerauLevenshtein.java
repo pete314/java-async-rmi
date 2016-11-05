@@ -6,23 +6,15 @@
  * @description DamerauLevenshtein - Implementation of the algorithm - details https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance
  * @package ie.peternagy.rmi.servant
  */
-package ie.peternagy.rmi.servant;
+package ie.peternagy.rmi.string.algo;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.UUID;
 
-public class DamerauLevenshtein extends UnicastRemoteObject implements StringComparable{
+public class DamerauLevenshtein extends StringAlgo{
     private static final long serialVersionUID = 1L;
-    private final UUID objectId = UUID.randomUUID();
-    private int result;
-    private boolean isProcessed = false;
-    private String str1;
-    private String str2;
 
     public DamerauLevenshtein(String str1, String str2) throws RemoteException{
-        this.str1 = str1;
-        this.str2 = str2;
+        super(str1, str2);
     }
 
     @Override
@@ -43,38 +35,4 @@ public class DamerauLevenshtein extends UnicastRemoteObject implements StringCom
         }
         return distance[s.length()][t.length()];
     }
-
-    @Override
-    public void run() throws RemoteException{
-        result = distance(str1, str2);
-        isProcessed = true;
-    }
-
-    @Override
-    public boolean isProcessed() throws RemoteException{
-        return isProcessed;
-    }
-
-    @Override
-    public int getResult() throws RemoteException{
-        return result;
-    }
-
-    public String getStr1() {
-        return str1;
-    }
-
-    public void setStr1(String str1) {
-        this.str1 = str1;
-    }
-
-    public String getStr2() {
-        return str2;
-    }
-
-    public void setStr2(String str2) {
-        this.str2 = str2;
-    }
-    
-    
 }
