@@ -11,8 +11,9 @@ package ie.peternagy.rmi.servant;
 import ie.peternagy.rmi.servant.StringComparisonService;
 import ie.peternagy.rmi.string.algo.AlgorithmFactory;
 import ie.peternagy.rmi.string.algo.StringComparable;
+import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.RMISecurityManager;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.UUID;
@@ -27,13 +28,24 @@ public class RemoteExecutionHandler implements Runnable{
     private final BlockingQueue<StringComparable> IN_QUEUE;
     private final Map<UUID, StringComparable> REQUEST_OBJECT_MAP;
     private final AlgorithmFactory algorithmFactory = AlgorithmFactory.getInstance();
-    private final StringComparisonService SCM;
+    private static StringComparisonService scm;
     private final String RMI_CONNECTION_PATTERN = "rmi://%s:%d/%s";
     
-    public RemoteExecutionHandler(String serviceHost, int servicePort, String serviceName) throws Exception {
+    public RemoteExecutionHandler(){
         IN_QUEUE = new LinkedBlockingQueue<>();
         REQUEST_OBJECT_MAP = new ConcurrentHashMap<>();
-        SCM = (StringComparisonService) Naming.lookup(String.format(RMI_CONNECTION_PATTERN, serviceHost, servicePort, serviceName));
+        
+    }
+    
+    public boolean initializeConnection(String serviceHost, int servicePort, String serviceName){
+        try {
+            scm = (StringComparisonService) Naming.lookup(String.format(RMI_CONNECTION_PATTERN, serviceHost, servicePort, serviceName));
+            return true;
+        } catch (NotBoundException | MalformedURLException | RemoteException ex) {
+            Logger.getLogger(RemoteExecutionHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
     }
     
     /**
@@ -98,10 +110,13 @@ public class RemoteExecutionHandler implements Runnable{
     }
     @Override
     public void run() {
+        System.out.println("Supervisor thread is running...");
         while(true){
             try {
                 StringComparable sc = IN_QUEUE.take();
-                SCM.execute(sc);
+                System.out.printf("\nExecuting new job, id: %s", sc.getObjectId());
+                
+                scm.execute(sc);
             } catch (InterruptedException | RemoteException ex) {
                 Logger.getLogger(RemoteExecutionHandler.class.getName()).log(Level.SEVERE, null, ex);
             }

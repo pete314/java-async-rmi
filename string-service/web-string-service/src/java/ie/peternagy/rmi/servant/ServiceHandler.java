@@ -8,11 +8,8 @@
  */
 package ie.peternagy.rmi.servant;
 
-import ie.peternagy.rmi.servant.RemoteExecutionHandler;
 import java.io.*;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
@@ -29,18 +26,17 @@ public class ServiceHandler extends HttpServlet {
         remoteServiceName = ctx.getInitParameter("RMI_SERVICE_NAME"); //Reads the value from the <context-param> in web.xml
         remotePort = Integer.parseInt(ctx.getInitParameter("RMI_SERVICE_PORT"));
         
-        try {
-            remoteExecutionHandler = new RemoteExecutionHandler(remoteHost, remotePort, remoteServiceName);
-            new Thread(){
-                @Override
-                public void run() {
-                    remoteExecutionHandler.run();
-                }
-            };
-        } catch (Exception ex) {
-            System.out.println("============================" + ex);
-            Logger.getLogger(ServiceHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        remoteExecutionHandler = new RemoteExecutionHandler();
+        if(!remoteExecutionHandler.initializeConnection(remoteHost, remotePort, remoteServiceName))
+            throw new RuntimeException("Could not initialize remote connection");
+        
+        //Start a supervision thread on the job Queue
+        new Thread(remoteExecutionHandler){
+            @Override
+            public void run() {
+                remoteExecutionHandler.run();
+            }
+        }.start();
     }
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -52,10 +48,7 @@ public class ServiceHandler extends HttpServlet {
         String s = req.getParameter("txtS");
         String t = req.getParameter("txtT");
         String taskNumber = req.getParameter("frmTaskNumber");
-
-        out.print("<html><head><title>Distributed Systems Assignment</title>");
-        out.print("</head>");
-        out.print("<body>");
+        String result = "";
 
         if (taskNumber == null) {
             String[] algorithmParts = algorithm.split(" ");
@@ -64,37 +57,104 @@ public class ServiceHandler extends HttpServlet {
         } else {
             UUID taskUUID = UUID.fromString(taskNumber);
             if(remoteExecutionHandler.isProcessed(taskUUID)){
+                result = ""+remoteExecutionHandler.getResult(taskUUID);
             }
         }
         
+        //Print the header
+        out.print(getGeneralHeader());
 
-        out.print("<H1>Processing request for Job#: " + taskNumber + "</H1>");
-        out.print("<div id=\"r\"></div>");
-
-        out.print("<font color=\"#993333\"><b>");
-        out.print("RMI Server is located at " + remoteHost);
-        out.print("<br>Algorithm: " + algorithm);
-        out.print("<br>String <i>s</i> : " + s);
-        out.print("<br>String <i>t</i> : " + t);
-        out.print("<br>This servlet should only be responsible for handling client request and returning responses. Everything else should be handled by different objects.");
-        out.print("Note that any variables declared inside this doGet() method are thread safe. Anything defined at a class level is shared between HTTP requests.");
-        out.print("</b></font>");
-
-        out.print("<form name=\"frmRequestDetails\">");
-        out.print("<input name=\"cmbAlgorithm\" type=\"hidden\" value=\"" + algorithm + "\">");
-        out.print("<input name=\"txtS\" type=\"hidden\" value=\"" + s + "\">");
-        out.print("<input name=\"txtT\" type=\"hidden\" value=\"" + t + "\">");
-        out.print("<input name=\"frmTaskNumber\" type=\"hidden\" value=\"" + taskNumber + "\">");
-        out.print("</form>");
-        out.print("</body>");
-        out.print("</html>");
-
-        out.print("<script>");
-        out.print("var wait=setTimeout(\"document.frmRequestDetails.submit();\", 10000);");
-        out.print("</script>");
+        //Print the general body content
+        out.print(getGeneralBodyWithParams(algorithm, t, t, taskNumber, taskNumber));
+        
+        if(!result.equals("")){
+            //Print the result
+            out.print(getResultContainer(result));
+        }else{
+            //Print hidden field
+            out.print(getBodyHiddenForm(algorithm, t, t, taskNumber, taskNumber, 1000));
+        }
+        
+        //Print the footer content
+        out.print(getGeneralFooter());
     }
 
+    
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         doGet(req, resp);
+    }
+    
+    /**
+     * Generate simple header
+     * @return header html string
+     */
+    private String getGeneralHeader(){
+        return "<html><head><title>Distributed Systems Assignment</title>" 
+                + "</head>"
+                + "<body>";
+    }
+    
+    /**
+     * Generate simple html closing 
+     * @return closing html string
+     */
+    private String getGeneralFooter(){
+        return "</body></html>";
+    }
+    
+    /**
+     * Generate the string content for html body
+     * @param algorithm
+     * @param str1
+     * @param str2
+     * @param taskNumber
+     * @param hostname
+     * @return 
+     */
+    private String getGeneralBodyWithParams(String algorithm, String str1, String str2, String taskNumber, String hostname){
+        return  "<center>"
+                + "<H1>Processing request for Job#:" + taskNumber + "</H1>" 
+                + "<div id=\"r\"></div>"
+                + "<font color=\"#993333\"><b>"
+                + "RMI Server is located at " + hostname
+                + "<br>Algorithm: " + algorithm
+                + "<br>String <i>s</i> : " + str1
+                + "<br>String <i>t</i> : " + str2
+                + "</b></font>"
+                + "</center>";
+    }
+    
+    /**
+     * Get body hidden form with resubmit script
+     * 
+     * @param algorithm - the current execution algorithm
+     * @param str1 - #1 string to run the algorithm with 
+     * @param str2 - #2 string to run the algorithm with 
+     * @param taskNumber - the internal task id
+     * @param hostname - the remote server host name
+     * @param resubmitInterval - re-submit interval for the form
+     * @return 
+     */
+    private String getBodyHiddenForm(String algorithm, String str1, String str2, String taskNumber, String hostname, int resubmitInterval){
+        return "<form name=\"frmRequestDetails\">"
+                + "<input name=\"cmbAlgorithm\" type=\"hidden\" value=\"" + algorithm + "\">"
+                + "<input name=\"txtS\" type=\"hidden\" value=\"" + str1 + "\">"
+                + "<input name=\"txtT\" type=\"hidden\" value=\"" + str2 + "\">"
+                + "<input name=\"frmTaskNumber\" type=\"hidden\" value=\"" + taskNumber + "\">"
+                + "</form>"
+                + "<script>"
+                + "var wait=setTimeout(\"document.frmRequestDetails.submit();\", "+ resubmitInterval +");"
+                + "</script>";
+    }
+    
+    /**
+     * Generate result html container
+     * @param result - the result to include in output
+     * @return 
+     */
+    private String getResultContainer(String result){
+        return "<center><br><font color=\"#993333\"><b>"
+                + "<br>The result is: " + result
+                + "</b></font></center>";
     }
 }
