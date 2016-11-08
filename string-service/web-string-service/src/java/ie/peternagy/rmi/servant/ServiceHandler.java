@@ -4,7 +4,7 @@
  * @since November 2016
  * @version 0.1
  * @description ServiceHandler - Short description
- * @package ie.peternagy.web.string.service
+ * @package  ie.peternagy.rmi.servant
  */
 package ie.peternagy.rmi.servant;
 
@@ -65,7 +65,7 @@ public class ServiceHandler extends HttpServlet {
         out.print(getGeneralHeader());
 
         //Print the general body content
-        out.print(getGeneralBodyWithParams(algorithm, t, t, taskNumber, taskNumber));
+        out.print(getGeneralBodyWithParams(algorithm, t, t, taskNumber, remoteHost));
         
         if(!result.equals("")){
             //Print the result

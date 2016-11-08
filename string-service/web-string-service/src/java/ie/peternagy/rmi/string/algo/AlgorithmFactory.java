@@ -13,8 +13,7 @@ import java.rmi.RemoteException;
 public class AlgorithmFactory {
     private static AlgorithmFactory algoFactory;
     
-    private AlgorithmFactory() {
-    }
+    private AlgorithmFactory() {}
     
     /**
      * Get singleton instance
@@ -44,9 +43,10 @@ public class AlgorithmFactory {
                 return new HammingDistance(str1, str2);
             case "Levenshtein":
                 return new Levenshtein(str1, str2);
+            case "Jaro–Winkler":
+                return new JaroWinkler(str1, str2);
             case "Euclidean":
             case "Hirschberg's":
-            case "Jaro–Winkler":
             case "Needleman-Wunsch":
             case "Smith":
             default:

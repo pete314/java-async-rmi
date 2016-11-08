@@ -8,7 +8,6 @@
  */
 package ie.peternagy.rmi.servant;
 
-import ie.peternagy.rmi.servant.StringComparisonService;
 import ie.peternagy.rmi.string.algo.AlgorithmFactory;
 import ie.peternagy.rmi.string.algo.StringComparable;
 import java.net.MalformedURLException;
