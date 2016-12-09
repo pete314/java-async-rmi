@@ -69,8 +69,8 @@ printf("\n**************\n\tNavigate to http://localhost:9000/web-string-service
 The jar containing the remote service can not be deployed a separate service as it requires a valid certificate for security reasons.
 
 # References
-[Java 8 docs](https://docs.oracle.com/javase/8/docs/api/)
-[Tomcat](https://tomcat.apache.org/)
-[Java RMI service](http://docs.oracle.com/javase/7/docs/technotes/guides/rmi/hello/hello-world.html)
-[Tomcat war deployment](https://tomcat.apache.org/tomcat-6.0-doc/deployer-howto.html)
+- [Java 8 docs](https://docs.oracle.com/javase/8/docs/api/)
+- [Tomcat](https://tomcat.apache.org/)
+- [Java RMI service](http://docs.oracle.com/javase/7/docs/technotes/guides/rmi/hello/hello-world.html)
+- [Tomcat war deployment](https://tomcat.apache.org/tomcat-6.0-doc/deployer-howto.html)
 
