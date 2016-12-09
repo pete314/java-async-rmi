@@ -18,3 +18,6 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+/string-service/rmi-string-service/target/
+/string-service/string-rmi-service/target/
+/string-service/web-string-service/target/
