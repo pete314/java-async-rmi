@@ -8,3 +8,4 @@ The project has 3 core part:
 - **Remote execution service**: handles the executions via a thread pool
 
 ### Project structural diagram
+![Project Architecture Diagram](https://raw.githubusercontent.com/pete314/java-async-rmi/master/docs/RMI_project_structure.png?token=AIYB_OOu86CCd1BcoOwQMwdsl1ee2TgLks5YVE7pwA%3D%3D)
