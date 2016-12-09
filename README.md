@@ -20,7 +20,7 @@ The execution and the status is monitored trough a map which holds the execution
 **Linux/Unix**<br>
 Open the terminal and execute the following commands
 ```bash
-# Dependencies curl or git
+# The following script requires wget
 # Make some structure for the application
 mkdir -p repo
 mkdir -p web-server
