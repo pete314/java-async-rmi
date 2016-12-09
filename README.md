@@ -1,11 +1,20 @@
 # An Asynchronous Java RMI String Comparison Service
-The project is a Java RMI String comparison service, which is meant to get user input from web browser and calculate the distance between the given string by the choosen algorithm.
+The project is a Java RMI String comparison service, which is meant to get user input from web browser and calculate the distance between the given string by the choosen algorithm. The service objects are executed asynchronously with remote object reference from a queue in a execution thread pool.  
 
 ## Project Structure
 The project has 3 core part:
 - **Web service**: handles requests from web browser and dispatches them to a remote execution handler
 - **Remote execution handler**: handles the remote executions trough RMI and keeps references to objects in/out execution
 - **Remote execution service**: handles the executions via a thread pool
+
+### Source packages and files
+The source code is available in ```string-service/web-string-service/src/java/ie/peternagy/rmi```:
+* **servant/RemoteExecutionHandler** - the RMI remote service executor, handles the thread pool
+* **servant/ServiceHandler** - the Servlet handling the requests from web front-end
+* **servant/StringComparisonServer** - the RMI remote service server
+* **servant/StringComparisonService** - the interface for remote service
+* **servant/StringComparisonService** - the impolementation for comparison remote service
+* **algo/AlgorithmFactory ** - Singleton factory for handling new algorithm object creation
 
 ### Project architecture
 ![Project Architecture Diagram](https://raw.githubusercontent.com/pete314/java-async-rmi/master/docs/RMI_project_structure.png?token=AIYB_OOu86CCd1BcoOwQMwdsl1ee2TgLks5YVE7pwA%3D%3D)
